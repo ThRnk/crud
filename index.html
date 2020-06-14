@@ -14,8 +14,9 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="./style.css">
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </head>
 
@@ -40,7 +41,7 @@
 
 						<a href="#addEmployeeModal" class="btn btn-outline-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Adicionar Novo Empregado</span></a>
 
-						<a href="#deleteSeveralEmployeesModal" class="btn btn-outline-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Excluir Selecionados</span></a>						
+						<!-- <a href="#deleteSeveralEmployeesModal" class="btn btn-outline-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Excluir Selecionados</span></a>						 -->
 
 					</div>
 
@@ -54,7 +55,7 @@
 
 					<tr>
 
-						<th>
+						<!-- <th>
 
 							<span class="custom-checkbox">
 
@@ -64,7 +65,7 @@
 
 							</span>
 
-						</th>
+						</th> -->
 
 						<th colspan="2">Nome</th>
 
@@ -78,47 +79,8 @@
 
 				</thead>
 
-				<tbody>
-
-					<tr>
-
-						<td>
-
-							<span class="custom-checkbox">
-
-								<input type="checkbox" id="checkbox1" name="options[]" value="1">
-
-								<label for="checkbox1"></label>
-
-							</span>
-
-						</td>
-
-						<td style="width: 40px">
-
-							<span class="custom-profile-image">
-
-								<img src="https://www.fiscalti.com.br/wp-content/uploads/2020/05/default-user-image-365x365.png">
-
-							</span>
-
-						</td>
-
-						<td>Aasdassger</td>
-
-						<td>58</td>
-
-						<td>39483</td>
-
-						<td>
-
-							<a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Editar">&#xE150;</i></a>
-
-							<a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Excluir">&#xE872;</i></a>
-
-						</td>
-
-					</tr>
+				<tbody id="table" >
+                    
 
 				</tbody>
 
@@ -156,7 +118,47 @@
 
 	</div>
 
-	<!-- FIM - Container Tabela -->
+    <!-- FIM - Container Tabela -->
+    <!-- Adicionar novo Usuario -->
+<script>
+
+function addUser () {
+      
+            var xhttp = new XMLHttpRequest();
+
+            xhttp.onreadystatechange = function() {
+
+                if (this.readyState == 4){ 
+
+                    if (this.status == 200){
+
+                        console.log("Cadastrado");  
+                        window.location.reload();
+                        
+                    }
+                }
+            };
+
+            xhttp.open("POST","https://us-central1-rest-api-employees.cloudfunctions.net/api/v1/create", true);
+            xhttp.setRequestHeader("Content-type", "application/json");
+
+            var NewEmpregado = {
+                "name": document.getElementById("addName").value,
+                "salary": document.getElementById("addSalary").value,
+                "age": document.getElementById("addAge").value,
+                "profile_image": document.getElementById("addProfileImagem").value,
+            };
+
+            xhttp.send(JSON.stringify(NewEmpregado));
+        };
+
+
+
+</script>
+
+
+
+
 
 	<!-- Add Modal HTML -->
 
@@ -165,8 +167,6 @@
 		<div class="modal-dialog">
 
 			<div class="modal-content">
-
-				<form>
 
 					<div class="modal-header">						
 
@@ -182,7 +182,7 @@
 
 							<label>Nome</label>
 
-							<input type="text" class="form-control" required>
+							<input id="addName" type="text" class="form-control" required>
 
 						</div>
 
@@ -190,7 +190,7 @@
 
 							<label>Idade</label>
 
-							<input type="number" class="form-control" required>
+							<input id="addAge" type="number" class="form-control" required>
 
 						</div>
 
@@ -198,7 +198,7 @@
 
 							<label>Salário</label>
 
-							<input type="number" step="any" class="form-control" required>
+							<input id="addSalary" type="number" step="any" class="form-control" required>
 
 						</div>
 
@@ -206,7 +206,7 @@
 
 							<label>Imagem de Perfil</label>
 
-							<input type="text" class="form-control" placeholder="http://" required>
+							<input id="addProfileImagem" type="text" class="form-control" placeholder="http://" required>
 
 						</div>		
 						
@@ -214,13 +214,11 @@
 
 					<div class="modal-footer">
 
-						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
-
-						<input type="submit" class="btn btn-success" value="Adicionar">
+                        <input type="button"  class="btn btn-default" data-dismiss="modal" value="Cancelar">
+                        
+						<button type="submit" value="submit" onclick="addUser()" class="btn btn-success" >Adicionar</button>
 
 					</div>
-
-				</form>
 
 			</div>
 
@@ -234,11 +232,11 @@
 
 	<div id="editEmployeeModal" class="modal fade">
 
+
 		<div class="modal-dialog">
 
 			<div class="modal-content">
 
-				<form>
 
 					<div class="modal-header">						
 
@@ -292,8 +290,6 @@
 
 					</div>
 
-				</form>
-
 			</div>
 
 		</div>
@@ -310,7 +306,6 @@
 
 			<div class="modal-content">
 
-				<form>
 
 					<div class="modal-header">						
 
@@ -322,10 +317,8 @@
 					</div>
 
 					<div class="modal-body">					
-
-						<p>Você tem certeza que deseja excluir o registros de NomeDaPessoa?</p>
-
-						<p class="text-warning"><small>Essa ação não pode ser desfeita.</small></p>
+           
+                            <!-- mensagem -->
 
 					</div>
 
@@ -333,12 +326,10 @@
 
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
 
-						<input type="submit" class="btn btn-danger" value="Excluir">
+						<button type="submit" class="btn btn-danger" id="excluirbtn" value="Excluir">Excluir</button>
 
 					</div>
 					
-				</form>
-
 			</div>
 
 		</div>
@@ -354,8 +345,6 @@
 		<div class="modal-dialog">
 
 			<div class="modal-content">
-
-				<form>
 
 					<div class="modal-header">						
 
@@ -382,8 +371,6 @@
 
 					</div>
 					
-				</form>
-
 			</div>
 
 		</div>
@@ -393,7 +380,7 @@
 	<!-- FIM - Excluir Múltiplos Modal HTML -->
 
 </body>
-
 <script src="./script.js"></script>
+
 
 </html>                
