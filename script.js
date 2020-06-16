@@ -1,14 +1,20 @@
 $(document).ready(function(){
-	
+    
+    reload();
+
 	// Ativa Tooltip
 	$('[data-toggle="tooltip"]').tooltip();
 
-	//$("#taskModal").modal('show');
-	
-	var checkbox = $('table tbody input[type="checkbox"]');
+    //$("#taskModal").modal('show');
+    
+    var selectedEmployee;
 
-	// Seleciona e Deseleciona Checkboxes
+    var selectedEmployeesIds = [];
+
+	// Seleciona e Deseleciona Checkboxes o clicar em selecionar todas
 	$("#selectAll").click(function(){
+
+        var checkbox = $('input[type="checkbox"]');
 
 		if(this.checked){
 
@@ -22,7 +28,9 @@ $(document).ready(function(){
 
 			checkbox.each(function(){
 
-				this.checked = false;          
+                this.checked = false;       
+                
+                selectedEmployeesIds = [];
 
 			});
 
@@ -30,140 +38,265 @@ $(document).ready(function(){
 
 	});
 
-	checkbox.click(function(){
+	$(document).on('click', '[type="checkbox"]', function(e) {
 
-		if(!this.checked){
+        if(!this.checked){
 
 			$("#selectAll").prop("checked", false);
 
 		}
 
+        $('#countChecked').empty().append('(' + $("[type='checkbox']:checked").not("#selectAll").length + ')');
+
     });
-    
-    
-    var xhttp = new XMLHttpRequest();
 
-    xhttp.onreadystatechange = function () {
+    // Recarrega todos os registros.
+    function reload() {
+
+        $('#dataTable').empty();
+
+        selectedEmployeesIds = [];
         
-        if (this.readyState == 4) {
+        $.ajax({
+            url: "http://rest-api-employees.jmborges.site/api/v1/employees",
+            type: "GET",
             
-            if (this.status == 200) {
+            success: function(result){
+    
+                $.each(result.data, function(index, value) {
+    
+                    $('#dataTable').append(
+                    '<tr>'+
+                        '<td>'+
+                            '<span class="custom-checkbox">'+
+                                '<input type="checkbox" id="' + value.id + '" name="options[]" value="' + value.id + '">'+
+                                '<label for="' + value.id + '"></label>'+
+                            '</span>'+
+                        '</td>'+
 
-                var objetoRetornado = JSON.parse(this.responseText);
+                        '<td style="width: 40px">'+
+    
+                            '<span class="custom-profile-image">'+
+    
+                            '<img src="'+((value.profile_imagem != null && value.profile_imagem.substring(0, 4) == 'http') ? value.profile_imagem : 'https://www.fiscalti.com.br/wp-content/uploads/2020/05/default-user-image-365x365.png') +'">'+
+    
+                            '</span>'+
+    
+                        '</td>'+
+    
+                        '<td data-nome="'+value.id+'">'+value.employee_name+'</td>'+
+                        '<td>'+value.employee_age+'</td>'+
+                        '<td> R$ '+ (value.employee_salary ? value.employee_salary.toFixed(2) : (0).toFixed(2)) + '</td>'+
+    
+                        
+                        '<td>'+
+                            '<a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Editar">&#xE150;</i></a>'+
+                            '<a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Excluir">&#xE872;</i></a>'+
+                        '</td>'+
+                    '</tr>')
+    
+                });
+    
+           }
+        
+        });
 
-                for (var i = 0; i < objetoRetornado.data.length; i++) {
-                    
-                    var employee = objetoRetornado.data[i];
-                    
-                    console.log(employee.employee_name)
+    }
+
+    // Trata a requisição ao clicar em "Adicionar" dentro do "Adicionar Novo Empregado"
+    $(document).on('click', '#addEmployee', function(e) {
+
+        e.preventDefault;
+
+        var newEmployee = {
+
+            "name": $("#addName").val(),
+            "salary": $("#addSalary").val(),
+            "age": $("#addAge").val(),
+            "profile_image": $("#addProfileImage").val(),
+            
+        };
+
+        var data1 = JSON.stringify(newEmployee);
+
+        $.ajax({
+            url: "http://rest-api-employees.jmborges.site/api/v1/create",
+            type: "POST",
+            data: data1,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            
+            success: function(result){
+
+                $('#addEmployeeModal').modal('hide');
+
+                reload();
+
+                $('#alreadyAddedEmployeeModal .modal-body').empty().append('<p>Os registros de '+ newEmployee['name'] + ' foram salvos com sucesso!</p>')
+
+                $("#alreadyAddedEmployeeModal").modal('show');
+                                                           
+            }
+        
+        });
+
+    });
+
+    // Trata a requisição ao clicar no "Ícone de Lápis"
+    $(document).on('click', '.edit', function(e) {
+
+        e.preventDefault;
+
+        $.ajax({
+            url: "http://rest-api-employees.jmborges.site/api/v1/employee/" + $(this).closest('tr').find('td[data-nome]').data('nome'),
+            type: "GET",
+            
+            success: function(result){
+
+                selectedEmployee = result.data;
+
+                $('#editEmployeeModal .modal-title').empty().append('<p>Editar '+ selectedEmployee.employee_name + '!</p>');
+
+                $("#editName").val(result.data.employee_name);
+                $("#editSalary").val(result.data.employee_salary);
+                $("#editAge").val(result.data.employee_age);
+                $("#editProfileImage").val(result.data.profile_image);
+
                 
-                    $('.table').append('<tr>'+
-                                            // '<td>'+
-                                            //     '<span class="custom-checkbox">'+
-                                            //         '<input type="checkbox" id="checkbox1" name="options[]" value="1">'+
-                                            //         '<label for="checkbox1"></label>'+
-                                            //     '</span>'+
-                                            // '</td>'+
+                                         
+            }
+        
+        });
 
-                                            '<td style="width: 40px">'+
+    });
 
-                                                '<span class="custom-profile-image">'+
-                    
-                                                '<img src="'+(employee.profile_imagem != null ? employee.profile_imagem : 'https://www.fiscalti.com.br/wp-content/uploads/2020/05/default-user-image-365x365.png') +'">'+
+    // Trata a requisição ao clicar no botão "Salvar" dentro do "Ícone de Lápis"
+    $(document).on('click', '#editEmployee', function(e) {
 
-                                                '</span>'+
-                    
-                                            '</td>'+
+        var newEmployee = {
+            "name": $("#editName").val(),
+            "salary": $("#editSalary").val(),
+            "age": $("#editAge").val(),
+            "profile_image": $("#editProfileImage").val(),
+        };
 
-                                            '<td data-nome="'+employee.id+'">'+employee.employee_name+'</td>'+
-                                            '<td>'+employee.employee_age+'</td>'+
-                                            '<td>'+employee.employee_salary+'</td>'+
+        var data1 = JSON.stringify(newEmployee);
 
-                                            
-                                            '<td>'+
-                                                '<a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Editar">&#xE150;</i></a>'+
-                                                '<a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Excluir">&#xE872;</i></a>'+
-                                            '</td>'+
-                                        '</tr>')
+        $.ajax({
+            url: "http://rest-api-employees.jmborges.site/api/v1/update/" + selectedEmployee.id,
+            type: "PUT",
+            data: data1,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            
+            success: function(result){
 
-                }
+                $('#editEmployeeModal').modal('hide');
 
+                reload();
 
-            } else {
+                $('#alreadyEditedEmployeeModal .modal-body').empty().append('<p>Os registros de '+ selectedEmployee.employee_name + ' foram atualizados com sucesso!</p>')
+
+                $("#alreadyEditedEmployeeModal").modal('show');
 
             }
-
-        }
-
-    };
-
-
         
-    $(function(){
-        $(document).on('click', '.delete', function(e) {
-            e.preventDefault;
-            window.id = $(this).closest('tr').find('td[data-nome]').data('nome');
+        });
 
+    });
 
-            var xhttp = new XMLHttpRequest();
+    // Trata a requisição ao clicar no "Ícone de Lixeira"
+    $(document).on('click', '.delete', function(e) {
 
-            xhttp.onreadystatechange = function () {
-                
-                if (this.readyState == 4) {
-                    
-                    if (this.status == 200) {
+        e.preventDefault;
+
+        $.ajax({
+            url: "http://rest-api-employees.jmborges.site/api/v1/employee/" + $(this).closest('tr').find('td[data-nome]').data('nome'),
+            type: "GET",
+            
+            success: function(result){
+
+                $('#deleteEmployeeModal .modal-body').empty().append('<p>Você tem certeza que deseja excluir o registros de '+ result.data.employee_name + '?</p>' +
+                                                                                '<p class="text-warning"><small>Essa ação não pode ser desfeita.</small></p>')
+
+                selectedEmployee = result.data;
+                                                           
+            }
         
-                        var objetoRetornado = JSON.parse(this.responseText);
-                        
-                        $('#deleteEmployeeModal .modal-body').append('<p>Você tem certeza que deseja excluir o registros de '+objetoRetornado.data.employee_name+'?</p>'+
+        });
+
+    });
+
+    // Trata a requisição ao clicar no botao "Excluir" dentro do "Ícone de Lixeira"
+    $(document).on('click', '#deleteEmployee', function(e) {
+
+        $.ajax({
+            url: "http://rest-api-employees.jmborges.site/api/v1/delete/" + selectedEmployee.id,
+            type: "DELETE",
+            
+            success: function(result){
+
+                $('#deleteEmployeeModal').modal('hide');
+
+                reload();
+
+                $('#alreadyDeletedEmployeeModal .modal-body').empty().append('<p>Os registros de '+ selectedEmployee.employee_name + ' foram excluídos com sucesso!</p>')
+
+                $("#alreadyDeletedEmployeeModal").modal('show');
+
+            }
+        
+        });
+
+    });
+
+    // Trata a requisição ao clicar no botao "Excluir Selecionados"
+    $(document).on('click', '#deleteSeveralEmployees', function(e) {
+
+        selectedEmployeesIds = [];
+
+        $("[type='checkbox']:checked").not("#selectAll").each(function(value){
+
+            selectedEmployeesIds.push($(this).attr('id'));
+
+        });
+
+        console.log(selectedEmployeesIds);
+
+        $('#deleteSeveralEmployeesModal .modal-body').empty().append('<p>Você tem certeza que deseja excluir estes ' + selectedEmployeesIds.length + ' registro(s) selecionado(s)?</p>' +
                                                                      '<p class="text-warning"><small>Essa ação não pode ser desfeita.</small></p>')
 
+    });
 
-                    
-                    }
+    // Trata a requisição ao clicar no botao "Excluir" dentro do "Excluir Selecionados"
+    $(document).on('click', '#deleteSeveralEmployeesConfirm', function(e) {
+
+        $.each(selectedEmployeesIds, function( index, value ) {
+
+            $.ajax({
+                url: "http://rest-api-employees.jmborges.site/api/v1/delete/" + value,
+                type: "DELETE",
+
+                success: function(result){
+
+                    console.log("Apagado");
+
                 }
-            }
-            xhttp.open ("GET", "https://us-central1-rest-api-employees.cloudfunctions.net/api/v1/employee/"+window.id, true);
-            
-            xhttp.setRequestHeader('Content-type', 'application/json');
+            });
+
+        });
+
         
-            xhttp.send();
+        $('#deleteSeveralEmployeesModal').modal('hide');
+
+        setTimeout(reload, 2000);
+
+        $('#alreadyDeletedSeveralEmployeesModal .modal-body').empty().append('<p>Os  '+ selectedEmployeesIds.length + ' registros selecionados foram excluídos com sucesso!</p>')
+
+        $("#alreadyDeletedSeveralEmployeesModal").modal('show');
 
 
-            
- 
-        });
     });
 
-
-    $( function(){
-        $(document).on('click', '#excluirbtn', function(e) {
-            e.preventDefault;
-            console.log(window.id);
-            
-
-
-            var xhttp = new XMLHttpRequest();
-
-
-            xhttp.open ("DELETE", "https://us-central1-rest-api-employees.cloudfunctions.net/api/v1/delete/"+window.id, true);        
-            xhttp.send();
-            window.location.reload();
-            
-            
- 
-        });
-    });
-    
-
-
-    xhttp.open ("GET", "https://us-central1-rest-api-employees.cloudfunctions.net/api/v1/employees", true);
-
-    xhttp.setRequestHeader('Content-type', 'application/json');
-
-    xhttp.send();
-
-
-
-    })
+});
     

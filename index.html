@@ -41,7 +41,7 @@
 
 						<a href="#addEmployeeModal" class="btn btn-outline-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Adicionar Novo Empregado</span></a>
 
-						<!-- <a href="#deleteSeveralEmployeesModal" class="btn btn-outline-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span>Excluir Selecionados</span></a>						 -->
+						<a href="#deleteSeveralEmployeesModal" class="btn btn-outline-danger" data-toggle="modal"><i class="material-icons">&#xE15C;</i> <span id="deleteSeveralEmployees">Excluir Selecionados&nbsp;</span><span id="countChecked">(0)</span></a>						
 
 					</div>
 
@@ -55,7 +55,7 @@
 
 					<tr>
 
-						<!-- <th>
+						<th>
 
 							<span class="custom-checkbox">
 
@@ -65,7 +65,7 @@
 
 							</span>
 
-						</th> -->
+						</th>
 
 						<th colspan="2">Nome</th>
 
@@ -79,7 +79,7 @@
 
 				</thead>
 
-				<tbody id="table" >
+				<tbody id="dataTable" >
                     
 
 				</tbody>
@@ -119,47 +119,6 @@
 	</div>
 
     <!-- FIM - Container Tabela -->
-    <!-- Adicionar novo Usuario -->
-<script>
-
-function addUser () {
-      
-            var xhttp = new XMLHttpRequest();
-
-            xhttp.onreadystatechange = function() {
-
-                if (this.readyState == 4){ 
-
-                    if (this.status == 200){
-
-                        console.log("Cadastrado");  
-                        window.location.reload();
-                        
-                    }
-                }
-            };
-
-            xhttp.open("POST","https://us-central1-rest-api-employees.cloudfunctions.net/api/v1/create", true);
-            xhttp.setRequestHeader("Content-type", "application/json");
-
-            var NewEmpregado = {
-                "name": document.getElementById("addName").value,
-                "salary": document.getElementById("addSalary").value,
-                "age": document.getElementById("addAge").value,
-                "profile_image": document.getElementById("addProfileImagem").value,
-            };
-
-            xhttp.send(JSON.stringify(NewEmpregado));
-        };
-
-
-
-</script>
-
-
-
-
-
 	<!-- Add Modal HTML -->
 
 	<div id="addEmployeeModal" class="modal fade">
@@ -206,7 +165,7 @@ function addUser () {
 
 							<label>Imagem de Perfil</label>
 
-							<input id="addProfileImagem" type="text" class="form-control" placeholder="http://" required>
+							<input id="addProfileImage" type="text" class="form-control" placeholder="http://" required>
 
 						</div>		
 						
@@ -216,7 +175,7 @@ function addUser () {
 
                         <input type="button"  class="btn btn-default" data-dismiss="modal" value="Cancelar">
                         
-						<button type="submit" value="submit" onclick="addUser()" class="btn btn-success" >Adicionar</button>
+						<button type="submit" value="submit" class="btn btn-success" id="addEmployee" >Adicionar</button>
 
 					</div>
 
@@ -227,7 +186,45 @@ function addUser () {
 	</div>
 
 	<!-- FIM - Add Modal HTML -->
+	<!-- Confirmação Add Modal HTML -->
 
+	<div id="alreadyAddedEmployeeModal" class="modal fade">
+
+		<div class="modal-dialog">
+
+			<div class="modal-content">
+
+
+					<div class="modal-header">						
+
+						
+						<h4 class="modal-title">Empregado Adicionado</h4>
+
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+					</div>
+
+					<div class="modal-body">					
+           
+						<p>Os registros de '+ selectedEmployee.name + ' foram salvos com sucesso!</p>
+
+					</div>
+
+					<div class="modal-footer">
+
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
+
+						<button type="submit" class="btn btn-success" data-dismiss="modal">Ok</button>
+
+					</div>
+					
+			</div>
+
+		</div>
+
+	</div>
+
+	<!-- FIM - Confirmação Add Modal HTML -->
 	<!-- Edição Modal HTML -->
 
 	<div id="editEmployeeModal" class="modal fade">
@@ -252,7 +249,7 @@ function addUser () {
 
 							<label>Nome</label>
 
-							<input type="text" class="form-control" required>
+							<input type="text" id="editName" class="form-control" required>
 
 						</div>
 
@@ -260,7 +257,7 @@ function addUser () {
 
 							<label>Idade</label>
 
-							<input type="number" class="form-control" required>
+							<input type="number" id="editAge" class="form-control" required>
 
 						</div>
 
@@ -268,7 +265,7 @@ function addUser () {
 
 							<label>Salário</label>
 
-							<input type="number" step="any" class="form-control" required>
+							<input type="number" id="editSalary" step="any" class="form-control" required>
 
 						</div>
 
@@ -276,7 +273,7 @@ function addUser () {
 
 							<label>Imagem de Perfil</label>
 
-							<input type="text" class="form-control" placeholder="http://" required>
+							<input type="text" id="editProfileImage" class="form-control" placeholder="http://" required>
 
 						</div>				
 
@@ -286,7 +283,7 @@ function addUser () {
 
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
 
-						<input type="submit" class="btn btn-success" value="Salvar">
+						<input type="submit" class="btn btn-success" id="editEmployee" value="Salvar">
 
 					</div>
 
@@ -297,7 +294,45 @@ function addUser () {
 	</div>
 
 	<!-- FIM - Edição Modal HTML -->
+	<!-- Confirmação Edição Modal HTML -->
 
+	<div id="alreadyEditedEmployeeModal" class="modal fade">
+
+		<div class="modal-dialog">
+
+			<div class="modal-content">
+
+
+					<div class="modal-header">						
+
+						
+						<h4 class="modal-title">Empregado Atualizado</h4>
+
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+					</div>
+
+					<div class="modal-body">					
+           
+						<p>Os registros de '+ selectedEmployee.name + ' foram atualizados com sucesso!</p>
+
+					</div>
+
+					<div class="modal-footer">
+
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
+
+						<button type="submit" class="btn btn-success" data-dismiss="modal">Ok</button>
+
+					</div>
+					
+			</div>
+
+		</div>
+
+	</div>
+
+	<!-- FIM - Confirmação Edição Modal HTML -->
 	<!-- Excluir Modal HTML -->
 
 	<div id="deleteEmployeeModal" class="modal fade">
@@ -326,7 +361,7 @@ function addUser () {
 
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
 
-						<button type="submit" class="btn btn-danger" id="excluirbtn" value="Excluir">Excluir</button>
+						<button type="submit" class="btn btn-danger" id="deleteEmployee" value="Excluir">Excluir</button>
 
 					</div>
 					
@@ -337,7 +372,45 @@ function addUser () {
 	</div>
 
 	<!-- FIM - Excluir Modal HTML -->
+	<!-- Confirmação Excluir Modal HTML -->
 
+	<div id="alreadyDeletedEmployeeModal" class="modal fade">
+
+		<div class="modal-dialog">
+
+			<div class="modal-content">
+
+
+					<div class="modal-header">						
+
+						
+						<h4 class="modal-title">Empregado Excluído</h4>
+
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+					</div>
+
+					<div class="modal-body">					
+           
+						<p>Os registros de '+ selectedEmployee.name + ' foram excluídos com sucesso!</p>
+
+					</div>
+
+					<div class="modal-footer">
+
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
+
+						<button type="submit" class="btn btn-success" data-dismiss="modal">Ok</button>
+
+					</div>
+					
+			</div>
+
+		</div>
+
+	</div>
+
+	<!-- FIM - Confirmação Excluir Modal HTML -->
 	<!-- Excluir Múltiplos Modal HTML -->
 
 	<div id="deleteSeveralEmployeesModal" class="modal fade">
@@ -367,7 +440,7 @@ function addUser () {
 
 						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
 
-						<input type="submit" class="btn btn-danger" value="Excluir">
+						<input type="submit" class="btn btn-danger" id="deleteSeveralEmployeesConfirm" value="Excluir">
 
 					</div>
 					
@@ -378,6 +451,45 @@ function addUser () {
 	</div>
 
 	<!-- FIM - Excluir Múltiplos Modal HTML -->
+	<!-- Confirmação Excluir Múltiplos Modal HTML -->
+
+	<div id="alreadyDeletedSeveralEmployeesModal" class="modal fade">
+
+		<div class="modal-dialog">
+
+			<div class="modal-content">
+
+
+					<div class="modal-header">						
+
+						
+						<h4 class="modal-title">Empregados Excluídos</h4>
+
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+					</div>
+
+					<div class="modal-body">					
+           
+						<p>Os x registros selecionados foram excluídos com sucesso!</p>
+
+					</div>
+
+					<div class="modal-footer">
+
+						<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancelar">
+
+						<button type="submit" class="btn btn-success" data-dismiss="modal">Ok</button>
+
+					</div>
+					
+			</div>
+
+		</div>
+
+	</div>
+
+	<!-- FIM - Confirmação Excluir Múltiplos Modal HTML -->
 
 </body>
 <script src="./script.js"></script>
