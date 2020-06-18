@@ -78,7 +78,7 @@ $(document).ready(function(){
     
                             '<span class="custom-profile-image">'+
     
-                            '<img src="'+((value.profile_imagem != null && value.profile_imagem.substring(0, 4) == 'http') ? value.profile_imagem : 'https://www.fiscalti.com.br/wp-content/uploads/2020/05/default-user-image-365x365.png') +'">'+
+                            '<img src="'+((value.profile_image != null && value.profile_image.substring(0, 4) == 'http') ? value.profile_image : 'https://www.fiscalti.com.br/wp-content/uploads/2020/05/default-user-image-365x365.png') +'">'+
     
                             '</span>'+
     
