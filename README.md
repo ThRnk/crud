@@ -13,7 +13,7 @@ R - Read <br>
 U - Update <br>
 D - Delete <br>
 
-### Requisitos:
+### Requisitos :heavy_check_mark:
 
 <ul>
   <li> Deve haver um formulário para criação de novos empregados; </li>
@@ -27,13 +27,15 @@ D - Delete <br>
   </li>
 </ul>
   
-### Tecnologias Utilizadas
+### Tecnologias Utilizadas :computer:
 
 <p align="center">
   <img height="100px" widht="100px" src="https://clipart.info/images/ccovers/1499794874html5-js-css3-logo-png.png">
 </p>
 
+---
+
 <p align="center">
-  <a href="https://github.com/ThRnk" ><img src="https://img.shields.io/badge/github-ThRnk-24292e"></a>
+  <a href="https://github.com/thrnkk" ><img src="https://img.shields.io/badge/github-thrnkk-24292e"></a>
   <a href="https://github.com/Luis-kuhn" ><img src="https://img.shields.io/badge/github-Luis--kuhn-24292e"></a>
 </p>
